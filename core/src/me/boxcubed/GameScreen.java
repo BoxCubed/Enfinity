@@ -97,16 +97,16 @@ public class GameScreen implements Screen{
     	camController.update();
     	
     	models.forEach(model->{
-    		model.location.add(0, 0, 1);
+    		model.location.add(0, 0, 0.7f*delta*100);
     		model.updateTransform();
     		if(model.location.z>5)deleteModels.add(model);
     	});
     	models.removeAll(deleteModels);
     	deleteModels.clear();
-    	System.out.println(models.size());
-    	if(elapsedTime>0.5){
+    	//System.out.println(delta*100);
+    	if(elapsedTime>0.03){
     		models.add(new ModelPack(genRandomColorInstance(), 
-    				new Vector3(random.nextInt(100)-50, 0, -100), new Quaternion()));
+    				new Vector3(random.nextInt(600)-300, 0, -100), new Quaternion()));
     		elapsedTime=0;
     	}
     	
@@ -118,22 +118,22 @@ public class GameScreen implements Screen{
     		/*if(player.location.x<50)
 			player.location.x+=1;
 			player.updateTransform();*/
-    		models.forEach(model->{model.location.x-=1;model.updateTransform();});
+    		models.forEach(model->{model.location.x-=0.7f*delta*100;model.updateTransform();});
 		}
     	if(Gdx.input.isKeyPressed(Keys.A)){
     		/*if(player.location.x>-50)
 			player.location.x-=1;
 			player.updateTransform();
 			cam.rotate(50, 0, 0, 0);*/
-    		models.forEach(model->{model.location.x+=1;model.updateTransform();});
+    		models.forEach(model->{model.location.x+=0.7f*delta*100;model.updateTransform();});
 		}
     	
     	if(Gdx.input.isKeyPressed(Keys.SPACE)&&player.location.y<10&&!top){
-    		player.location.y+=1;
+    		player.location.y+=0.7*delta*100;
     		player.updateTransform();
     		if(player.location.y>=10)top=true;
     	}else if(player.location.y>0){
-    		player.location.y-=0.5;
+    		player.location.y-=0.35*delta*100;
     		player.updateTransform();
     		
     	}else if(player.location.y<=0){
