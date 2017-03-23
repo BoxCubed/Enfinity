@@ -1,14 +1,12 @@
-package com.mygdx.game.desktop;
+package me.boxcubed.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mygdx.game.Enfinity;
+import me.boxcubed.Enfinity;
 
-public class DesktopLauncher {
+public class EnfinityDesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		new LwjglApplication(new Enfinity(), config);
-		config.width = 1500;
-		config.height = 1000;
 	}
 }
