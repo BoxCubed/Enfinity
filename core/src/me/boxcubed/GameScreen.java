@@ -65,6 +65,7 @@ public class GameScreen implements Screen{
         
         
         
+        
        /* player=new ModelPack( new ModelInstance(modelBuilder.createBox(2f, 2f, 2f,
         		new Material(TextureAttribute.createDiffuse(new Texture(Gdx.files.internal("badlogic.jpg")))),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates)),
@@ -72,11 +73,11 @@ public class GameScreen implements Screen{
         
          player=new ModelPack( new ModelInstance(assets.get("models/ship/ship.g3db",Model.class)),
 		new Vector3(0, 0, -20), new Quaternion());
-         player.model.transform.scale(3,3,3);
-         
-        
-        		
-        		
+         //player.model.transform.scale(3,3,3);
+         player.scale.add(3);
+         player.rotation.setFromAxis(Vector3.Y, 180);
+         player.updateTransform();
+        //player.model.transform.rotate(Vector3.Y,180);        		
         		
         		
         		
@@ -89,8 +90,7 @@ public class GameScreen implements Screen{
 
         camController = new CameraInputController(cam);
         
-       // player.model.transform.rotate(new Vector3(0, 0 , 1), 90);
-    	//player.model.transform.getRotation(player.rotation);
+        
 
     }
     Random random=new Random();
@@ -98,7 +98,6 @@ public class GameScreen implements Screen{
     boolean top=false;
     void update(float delta){
     	elapsedTime+=delta;
-    	
     	camController.update();
     	
     	models.forEach(model->{
@@ -117,13 +116,14 @@ public class GameScreen implements Screen{
     	
     	//cam.lookAt(player.location);
     	
-    	
+    	float roll=0;
     	
     	if(Gdx.input.isKeyPressed(Keys.D)){
     		/*if(player.location.x<50)
 			player.location.x+=1;
 			player.updateTransform();*/
     		models.forEach(model->{model.location.x-=0.7f*delta*100;model.updateTransform();});
+    		roll=45;
 		}
     	if(Gdx.input.isKeyPressed(Keys.A)){
     		/*if(player.location.x>-50)
@@ -131,15 +131,19 @@ public class GameScreen implements Screen{
 			player.updateTransform();
 			cam.rotate(50, 0, 0, 0);*/
     		models.forEach(model->{model.location.x+=0.7f*delta*100;model.updateTransform();});
-		}
+    		roll=-45;
+    	}
+    	
+    		player.rotation.setEulerAngles(180, 0, roll);
+    	
     	
     	if(Gdx.input.isKeyPressed(Keys.SPACE)&&player.location.y<10&&!top){
     		player.location.y+=0.7*delta*100;
-    		player.updateTransform();
+    		player.rotation.setEulerAngles(180, -90, roll);
     		if(player.location.y>=10)top=true;
     	}else if(player.location.y>0){
     		player.location.y-=0.35*delta*100;
-    		player.updateTransform();
+    		
     		
     	}else if(player.location.y<=0){
     		top=false;
@@ -151,6 +155,7 @@ public class GameScreen implements Screen{
     		create();
         
     }
+    	player.updateTransform();
     	//player.model.transform.rotate(0, 1, 0, player.location.y);
     	//player.model.transform.getRotation(player.rotation);
 		
@@ -167,8 +172,9 @@ public class GameScreen implements Screen{
         //instance.transform.translate(0.06f,0,0);
        // instance.transform.rotate(1, 0, 0, 1);
         modelBatch.begin(cam);
-        models.forEach(model->modelBatch.render(model.model,environment));
+        
         modelBatch.render(player.model,environment);
+        models.forEach(model->modelBatch.render(model.model,environment));
         modelBatch.end();
     }
 
@@ -199,13 +205,15 @@ public class GameScreen implements Screen{
 			this.model = model;
 			this.location = location;
 			this.rotation = rotation;
+			
+			scale.add(1);
 			updateTransform();
 		}
 		
     	
     	public void updateTransform(){
-    		
-    		model.transform.set(location,model.transform.getRotation(rotation),model.transform.getScale(scale));
+    		model.transform.setToTranslationAndScaling(location, scale);
+    		model.transform.rotate(rotation);
     	}
     }
 	@Override
