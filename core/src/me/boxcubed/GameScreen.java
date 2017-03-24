@@ -7,6 +7,7 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -18,7 +19,6 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -35,6 +35,7 @@ public class GameScreen implements Screen{
     List<ModelPack> deleteModels=new ArrayList<>();
     Texture tex;
     ModelPack player;
+    AssetManager assets;
  public GameScreen() {
 	 create();
 }
@@ -53,38 +54,42 @@ public class GameScreen implements Screen{
         cam.near = 1f;
         cam.far = 3000f;
         cam.update();
-
+        assets=new AssetManager();
+        assets.load("models/ship/ship.g3db", Model.class);
+        while(!assets.update()){}
+        
         ModelBuilder modelBuilder = new ModelBuilder();
         model = modelBuilder.createBox(5f, 5f, 5f,
         		/*new Material(TextureAttribute.createDiffuse(tex))*/new Material(ColorAttribute.createDiffuse(Color.GOLD)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
-        player=new ModelPack( new ModelInstance(modelBuilder.createBox(2f, 2f, 2f,
-        		/*new Material(TextureAttribute.createDiffuse(tex))*/new Material(TextureAttribute.createDiffuse(new Texture(Gdx.files.internal("badlogic.jpg")))),
+        
+        
+        
+       /* player=new ModelPack( new ModelInstance(modelBuilder.createBox(2f, 2f, 2f,
+        		new Material(TextureAttribute.createDiffuse(new Texture(Gdx.files.internal("badlogic.jpg")))),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates)),
-        		new Vector3(0, 0, -20), new Quaternion());
+        		new Vector3(0, 0, -20), new Quaternion());*/
+        
+         player=new ModelPack( new ModelInstance(assets.get("models/ship/ship.g3db",Model.class)),
+		new Vector3(0, 0, -20), new Quaternion());
+         player.model.transform.scale(3,3,3);
+         
         
         		
         		
         		
         		
         		
-       // modelBuilder.begin();
-      /* modelBuilder.part("box", GL20.GL_TRIANGLES, 
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates,
-                new Material(TextureAttribute.createDiffuse(new Texture(Gdx.files.internal("badlogic.jpg")))))
-            .box(0, 0, 0);;*/
-        //model=modelBuilder.end();
+       
        ModelInstance modelIns=new ModelInstance(model);
-       //modelIns.transform.set(new Vector3(-100, 0, 0), modelIns.transform.getRotation(new Quaternion()));
         
         models.add(new ModelPack(modelIns, new Vector3(0, 0, -100), new Quaternion()));
         
     
 
         camController = new CameraInputController(cam);
-        //Gdx.input.setInputProcessor(camController);
         
-        player.model.transform.rotate(new Vector3(0, 0 , 1), 90);
+       // player.model.transform.rotate(new Vector3(0, 0 , 1), 90);
     	//player.model.transform.getRotation(player.rotation);
 
     }
@@ -106,7 +111,7 @@ public class GameScreen implements Screen{
     	//System.out.println(delta*100);
     	if(elapsedTime>0.03){
     		models.add(new ModelPack(genRandomColorInstance(), 
-    				new Vector3(random.nextInt(600)-300, 0, -100), new Quaternion()));
+    				new Vector3(random.nextInt(600)-300, 0, random.nextInt(900)-1000), new Quaternion()));
     		elapsedTime=0;
     	}
     	
@@ -146,7 +151,7 @@ public class GameScreen implements Screen{
     		create();
         
     }
-    	player.model.transform.rotate(0, 1, 0, player.location.y);
+    	//player.model.transform.rotate(0, 1, 0, player.location.y);
     	//player.model.transform.getRotation(player.rotation);
 		
     	
@@ -188,6 +193,7 @@ public class GameScreen implements Screen{
     	public ModelInstance model;
     	public Vector3 location;
     	public Quaternion rotation;
+    	public Vector3 scale=new Vector3();
     	public ModelPack(ModelInstance model, Vector3 location, Quaternion rotation) {
 			super();
 			this.model = model;
@@ -199,7 +205,7 @@ public class GameScreen implements Screen{
     	
     	public void updateTransform(){
     		
-    		model.transform.set(location,model.transform.getRotation(rotation));
+    		model.transform.set(location,model.transform.getRotation(rotation),model.transform.getScale(scale));
     	}
     }
 	@Override
