@@ -31,6 +31,7 @@ public class GameScreen implements Screen{
     public CameraInputController camController;
     public ModelBatch modelBatch;
     public Model model;
+    ModelInstance space;
     List<ModelPack> models;
     List<ModelPack> deleteModels=new ArrayList<>();
     Texture tex;
@@ -56,13 +57,15 @@ public class GameScreen implements Screen{
         cam.update();
         assets=new AssetManager();
         assets.load("models/ship/ship.g3db", Model.class);
+        assets.load("models/spacesphere.obj",Model.class);
+        assets.load("models/rock/rock.obj",Model.class);
         while(!assets.update()){}
         
         ModelBuilder modelBuilder = new ModelBuilder();
         model = modelBuilder.createBox(5f, 5f, 5f,
         		/*new Material(TextureAttribute.createDiffuse(tex))*/new Material(ColorAttribute.createDiffuse(Color.GOLD)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
-        
+         model=assets.get("models/rock/rock.obj",Model.class);
         
         
         
@@ -74,7 +77,7 @@ public class GameScreen implements Screen{
          player=new ModelPack( new ModelInstance(assets.get("models/ship/ship.g3db",Model.class)),
 		new Vector3(0, 0, -20), new Quaternion());
          //player.model.transform.scale(3,3,3);
-         player.scale.add(3);
+         player.scale.set(4, 4, 4);
          player.rotation.setFromAxis(Vector3.Y, 180);
          player.updateTransform();
         //player.model.transform.rotate(Vector3.Y,180);        		
@@ -84,9 +87,10 @@ public class GameScreen implements Screen{
        
        ModelInstance modelIns=new ModelInstance(model);
         
-        models.add(new ModelPack(modelIns, new Vector3(0, 0, -100), new Quaternion()));
+        models.add(new ModelPack(modelIns, new Vector3(0, 4, -100), new Quaternion()));
         
-    
+        space=new ModelInstance(assets.get("models/spacesphere.obj",Model.class));
+        space.transform.scl(3);
 
         camController = new CameraInputController(cam);
         
@@ -101,7 +105,9 @@ public class GameScreen implements Screen{
     	camController.update();
     	
     	models.forEach(model->{
+    		if(!Gdx.input.isKeyPressed(Keys.P))
     		model.location.add(0, 0, 0.7f*delta*100);
+    		//model.rotation.add(3, 4, 7, 9);
     		model.updateTransform();
     		if(model.location.z>5)deleteModels.add(model);
     	});
@@ -110,7 +116,7 @@ public class GameScreen implements Screen{
     	//System.out.println(delta*100);
     	if(elapsedTime>0.03){
     		models.add(new ModelPack(genRandomColorInstance(), 
-    				new Vector3(random.nextInt(600)-300, 0, random.nextInt(900)-1000), new Quaternion()));
+    				new Vector3(random.nextInt(600)-300, 4, random.nextInt(900)-1000), new Quaternion()));
     		elapsedTime=0;
     	}
     	
@@ -124,6 +130,7 @@ public class GameScreen implements Screen{
 			player.updateTransform();*/
     		models.forEach(model->{model.location.x-=0.7f*delta*100;model.updateTransform();});
     		roll=45;
+    		space.transform.rotate(Vector3.Y, 1);
 		}
     	if(Gdx.input.isKeyPressed(Keys.A)){
     		/*if(player.location.x>-50)
@@ -132,10 +139,12 @@ public class GameScreen implements Screen{
 			cam.rotate(50, 0, 0, 0);*/
     		models.forEach(model->{model.location.x+=0.7f*delta*100;model.updateTransform();});
     		roll=-45;
+    		space.transform.rotate(Vector3.Y, -1);
     	}
     	
     		player.rotation.setEulerAngles(180, 0, roll);
-    	
+    		space.transform.rotate(Vector3.X,0.05f);
+    		System.out.println(delta*100);
     	
     	if(Gdx.input.isKeyPressed(Keys.SPACE)&&player.location.y<10&&!top){
     		player.location.y+=0.7*delta*100;
@@ -156,8 +165,6 @@ public class GameScreen implements Screen{
         
     }
     	player.updateTransform();
-    	//player.model.transform.rotate(0, 1, 0, player.location.y);
-    	//player.model.transform.getRotation(player.rotation);
 		
     	
     
@@ -175,6 +182,7 @@ public class GameScreen implements Screen{
         
         modelBatch.render(player.model,environment);
         models.forEach(model->modelBatch.render(model.model,environment));
+        modelBatch.render(space);
         modelBatch.end();
     }
 
@@ -206,7 +214,7 @@ public class GameScreen implements Screen{
 			this.location = location;
 			this.rotation = rotation;
 			
-			scale.add(1);
+			scale.add(3);
 			updateTransform();
 		}
 		
@@ -240,7 +248,7 @@ public class GameScreen implements Screen{
 			
 		}
 		
-		ret.materials.get(0).set(ColorAttribute.createDiffuse(at));
+		//ret.materials.get(0).set(ColorAttribute.createDiffuse(at));
 		
 		return ret;
 	}
