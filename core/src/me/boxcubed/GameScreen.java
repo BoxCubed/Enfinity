@@ -1,9 +1,5 @@
 package me.boxcubed;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -25,6 +21,10 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class GameScreen implements Screen{
     public Environment environment;
     public PerspectiveCamera cam;
@@ -37,9 +37,13 @@ public class GameScreen implements Screen{
     Texture tex;
     ModelPack player;
     AssetManager assets;
+	Random random = new Random();
+	float elapsedTime = 0;
+	boolean top = false;
  public GameScreen() {
 	 create();
 }
+
     public void create() {
     	models=new ArrayList<>();
     	tex=new Texture("logo.png");
@@ -60,58 +64,56 @@ public class GameScreen implements Screen{
         assets.load("models/spacesphere.obj",Model.class);
         assets.load("models/rock/rock.obj",Model.class);
         while(!assets.update()){}
-        
+
         ModelBuilder modelBuilder = new ModelBuilder();
         model = modelBuilder.createBox(5f, 5f, 5f,
         		/*new Material(TextureAttribute.createDiffuse(tex))*/new Material(ColorAttribute.createDiffuse(Color.GOLD)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates);
          model=assets.get("models/rock/rock.obj",Model.class);
-        
-        
-        
+
+
+
        /* player=new ModelPack( new ModelInstance(modelBuilder.createBox(2f, 2f, 2f,
         		new Material(TextureAttribute.createDiffuse(new Texture(Gdx.files.internal("badlogic.jpg")))),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates)),
         		new Vector3(0, 0, -20), new Quaternion());*/
-        
+
          player=new ModelPack( new ModelInstance(assets.get("models/ship/ship.g3db",Model.class)),
 		new Vector3(0, 0, -20), new Quaternion());
          //player.model.transform.scale(3,3,3);
          player.scale.set(4, 4, 4);
          player.rotation.setFromAxis(Vector3.Y, 180);
          player.updateTransform();
-        //player.model.transform.rotate(Vector3.Y,180);        		
-        		
-        		
-        		
-       
+		//player.model.transform.rotate(Vector3.Y,180);
+
+
+
+
        ModelInstance modelIns=new ModelInstance(model);
-        
+
         models.add(new ModelPack(modelIns, new Vector3(0, 4, -100), new Quaternion()));
-        
+
         space=new ModelInstance(assets.get("models/spacesphere.obj",Model.class));
         space.transform.scl(3);
 
         camController = new CameraInputController(cam);
-        
-        
 
-    }
-    Random random=new Random();
-    float elapsedTime=0;
-    boolean top=false;
+
+	}
+
     void update(float delta){
     	elapsedTime+=delta;
     	camController.update();
-    	
-    	models.forEach(model->{
-    		if(!Gdx.input.isKeyPressed(Keys.P))
+		for (ModelPack model : models)
+
+		{
+			if(!Gdx.input.isKeyPressed(Keys.P))
     		model.location.add(0, 0, 0.7f*delta*100);
     		//model.rotation.add(3, 4, 7, 9);
     		model.updateTransform();
     		if(model.location.z>5)deleteModels.add(model);
-    	});
-    	models.removeAll(deleteModels);
+		}
+		models.removeAll(deleteModels);
     	deleteModels.clear();
     	//System.out.println(delta*100);
     	if(elapsedTime>0.03){
@@ -123,31 +125,37 @@ public class GameScreen implements Screen{
     	//cam.lookAt(player.location);
     	
     	float roll=0;
-    	
-    	if(Gdx.input.isKeyPressed(Keys.D)){
-    		/*if(player.location.x<50)
+
+		if (Gdx.input.isKeyPressed(Keys.D) || (Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
+			/*if(player.location.x<50)
 			player.location.x+=1;
 			player.updateTransform();*/
-    		models.forEach(model->{model.location.x-=0.7f*delta*100;model.updateTransform();});
-    		roll=45;
+			for (ModelPack model : models) {
+				model.location.x -= 0.7f * delta * 100;
+				model.updateTransform();
+			}
+			roll=45;
     		space.transform.rotate(Vector3.Y, 1);
 		}
-    	if(Gdx.input.isKeyPressed(Keys.A)){
-    		/*if(player.location.x>-50)
+		if (Gdx.input.isKeyPressed(Keys.A) || (Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
+			/*if(player.location.x>-50)
 			player.location.x-=1;
 			player.updateTransform();
 			cam.rotate(50, 0, 0, 0);*/
-    		models.forEach(model->{model.location.x+=0.7f*delta*100;model.updateTransform();});
-    		roll=-45;
+			for (ModelPack model : models) {
+				model.location.x += 0.7f * delta * 100;
+				model.updateTransform();
+			}
+			roll=-45;
     		space.transform.rotate(Vector3.Y, -1);
     	}
     	
     		player.rotation.setEulerAngles(180, 0, roll);
     		space.transform.rotate(Vector3.X,0.05f);
     		System.out.println(delta*100);
-    	
-    	if(Gdx.input.isKeyPressed(Keys.SPACE)&&player.location.y<10&&!top){
-    		player.location.y+=0.7*delta*100;
+
+		if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
+			player.location.y+=0.7*delta*100;
     		player.rotation.setEulerAngles(180, -90, roll);
     		if(player.location.y>=10)top=true;
     	}else if(player.location.y>0){
@@ -159,8 +167,8 @@ public class GameScreen implements Screen{
     	}
     	cam.position.x=player.location.x;
     	cam.update();
-    	if(Gdx.input.isKeyJustPressed(Keys.R)){
-    		dispose();
+		if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
+			dispose();
     		create();
         
     }
@@ -181,7 +189,10 @@ public class GameScreen implements Screen{
         modelBatch.begin(cam);
         
         modelBatch.render(player.model,environment);
-        models.forEach(model->modelBatch.render(model.model,environment));
+		for (ModelPack model : models)
+			modelBatch.render(model.model, environment);
+
+
         modelBatch.render(space);
         modelBatch.end();
     }
@@ -203,37 +214,19 @@ public class GameScreen implements Screen{
     @Override
     public void resume() {
     }
-    class ModelPack{
-    	public ModelInstance model;
-    	public Vector3 location;
-    	public Quaternion rotation;
-    	public Vector3 scale=new Vector3();
-    	public ModelPack(ModelInstance model, Vector3 location, Quaternion rotation) {
-			super();
-			this.model = model;
-			this.location = location;
-			this.rotation = rotation;
-			
-			scale.add(3);
-			updateTransform();
-		}
-		
-    	
-    	public void updateTransform(){
-    		model.transform.setToTranslationAndScaling(location, scale);
-    		model.transform.rotate(rotation);
-    	}
-    }
+
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		
+
 	}
+
 	private ModelInstance genRandomColorInstance(){
 		ModelInstance ret=new ModelInstance(model);
 		Color at=Color.YELLOW;
@@ -244,12 +237,35 @@ public class GameScreen implements Screen{
 			break;
 		case 2: at=Color.BLUE;
 		  	break;
-		  	
-			
+
+
 		}
-		
+
 		//ret.materials.get(0).set(ColorAttribute.createDiffuse(at));
-		
+
 		return ret;
+	}
+
+	class ModelPack {
+		public ModelInstance model;
+		public Vector3 location;
+		public Quaternion rotation;
+		public Vector3 scale = new Vector3();
+
+		public ModelPack(ModelInstance model, Vector3 location, Quaternion rotation) {
+			super();
+			this.model = model;
+			this.location = location;
+			this.rotation = rotation;
+
+			scale.add(3);
+			updateTransform();
+		}
+
+
+		public void updateTransform() {
+			model.transform.setToTranslationAndScaling(location, scale);
+			model.transform.rotate(rotation);
+		}
 	}
 }
