@@ -1,5 +1,6 @@
 package me.boxcubed;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
@@ -107,8 +108,8 @@ public class GameScreen implements Screen{
 		for (ModelPack model : models)
 
 		{
-			if(!Gdx.input.isKeyPressed(Keys.P))
-    		model.location.add(0, 0, 0.7f*delta*100);
+			if (!Gdx.input.isKeyPressed(Keys.P) || !Gdx.input.isTouched(3))
+				model.location.add(0, 0, 0.7f*delta*100);
     		//model.rotation.add(3, 4, 7, 9);
     		model.updateTransform();
     		if(model.location.z>5)deleteModels.add(model);
@@ -151,8 +152,8 @@ public class GameScreen implements Screen{
     	}
     	
     		player.rotation.setEulerAngles(180, 0, roll);
-    		space.transform.rotate(Vector3.X,0.05f);
-    		System.out.println(delta*100);
+		space.transform.rotate(Vector3.X, -0.05f);
+
 
 		if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
 			player.location.y+=0.7*delta*100;
@@ -168,6 +169,9 @@ public class GameScreen implements Screen{
     	cam.position.x=player.location.x;
     	cam.update();
 		if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
+			if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+				Enfinity.androidAPI.makeToast("Restarting...");
+
 			dispose();
     		create();
         
