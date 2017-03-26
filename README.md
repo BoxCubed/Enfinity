@@ -1,7 +1,6 @@
 # Enfinity
-This is a personal project that im working on alone. This game is a side-scroller made using the LibGDX and Box2d api's 
-If this game goes well then i willl make an Android & iOS version.
+This is a 3D project that we are working on. This game still needs a basic idea but will  be made using the LibGDX and Bullet api's.
+If this game goes well then it might be released on the Android app store. Sadly not ios until the shitheads there decide to not only let mac develop apps (Or we find a willing friend).
+ps. feel free to use this for educational purposes (if the game never gets realesed on the play store).
 
-ps. feel free to use this for educational purposes
-
-Game by Tej Sidhu
+Game idea by Tej Sidhu, developed by BoxCubed.
