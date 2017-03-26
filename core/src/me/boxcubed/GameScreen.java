@@ -20,6 +20,8 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class GameScreen implements Screen{
 }
 
     public void create() {
+    	Bullet.init();
     	models=new ArrayList<>();
     	tex=new Texture("logo.png");
         environment = new Environment();
