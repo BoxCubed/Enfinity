@@ -159,6 +159,7 @@ public class GameScreen implements Screen{
 
 		if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
 			player.location.y+=0.7*delta*100;
+
     		player.rotation.setEulerAngles(180, -90, roll);
     		if(player.location.y>=10)top=true;
     	}else if(player.location.y>0){
@@ -171,14 +172,11 @@ public class GameScreen implements Screen{
     	cam.position.x=player.location.x;
     	cam.update();
 		if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
-            if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+            if (Gdx.app.getType().equals(Application.ApplicationType.Android))
                 Enfinity.androidAPI.makeToast("Restarting...");
-                Gdx.app.log("Android", "sent toast test");
-            }
 
 
-
-			dispose();
+            dispose();
     		create();
         
     }

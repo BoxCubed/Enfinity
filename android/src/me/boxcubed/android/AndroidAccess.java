@@ -2,6 +2,8 @@ package me.boxcubed.android;
 
 import android.widget.Toast;
 
+import com.badlogic.gdx.Gdx;
+
 import me.boxcubed.AndroidLauncher;
 import me.boxcubed.platform.AndroidAPI;
 
@@ -23,7 +25,8 @@ public class AndroidAccess implements AndroidAPI {
         launcher.handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(launcher, string, Toast.LENGTH_LONG);
+                Toast.makeText(launcher, string, Toast.LENGTH_LONG).show();
+                Gdx.app.log("[Android]", "sent toast : " + string);
             }
         });
 
