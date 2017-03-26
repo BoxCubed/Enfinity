@@ -112,76 +112,25 @@ public class GameScreen implements Screen{
 		{
 			if (!Gdx.input.isKeyPressed(Keys.P) || !Gdx.input.isTouched(3))
 				model.location.add(0, 0, 0.7f*delta*100);
-    		//model.rotation.add(3, 4, 7, 9);
+
     		model.updateTransform();
     		if(model.location.z>5)deleteModels.add(model);
 		}
 		models.removeAll(deleteModels);
     	deleteModels.clear();
-    	//System.out.println(delta*100);
+
     	if(elapsedTime>0.03){
     		models.add(new ModelPack(genRandomColorInstance(), 
     				new Vector3(random.nextInt(600)-300, 4, random.nextInt(900)-1000), new Quaternion()));
     		elapsedTime=0;
     	}
+        handleInput(delta);
+
     	
-    	//cam.lookAt(player.location);
-    	
-    	float roll=0;
 
-		if (Gdx.input.isKeyPressed(Keys.D) || (Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
-			/*if(player.location.x<50)
-			player.location.x+=1;
-			player.updateTransform();*/
-			for (ModelPack model : models) {
-				model.location.x -= 0.7f * delta * 100;
-				model.updateTransform();
-			}
-			roll=45;
-    		space.transform.rotate(Vector3.Y, 1);
-		}
-		if (Gdx.input.isKeyPressed(Keys.A) || (Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
-			/*if(player.location.x>-50)
-			player.location.x-=1;
-			player.updateTransform();
-			cam.rotate(50, 0, 0, 0);*/
-			for (ModelPack model : models) {
-				model.location.x += 0.7f * delta * 100;
-				model.updateTransform();
-			}
-			roll=-45;
-    		space.transform.rotate(Vector3.Y, -1);
-    	}
-    	
-    		player.rotation.setEulerAngles(180, 0, roll);
-		space.transform.rotate(Vector3.X, -0.05f);
-
-
-		if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
-			player.location.y+=0.7*delta*100;
-
-    		player.rotation.setEulerAngles(180, -90, roll);
-    		if(player.location.y>=10)top=true;
-    	}else if(player.location.y>0){
-    		player.location.y-=0.35*delta*100;
-    		
-    		
-    	}else if(player.location.y<=0){
-    		top=false;
-    	}
-    	cam.position.x=player.location.x;
-    	cam.update();
-		if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
-            if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-                Enfinity.androidAPI.makeToast("Restarting...");
-
-
-            dispose();
-    		create();
-        
-    }
     	player.updateTransform();
-		
+       /* if(Gdx.app.getType().equals(Application.ApplicationType.Android))
+            Gdx.app.log("[Android] : ",Gdx.input.getAccelerometerX()+","+Gdx.input.getAccelerometerY()+","+Gdx.input.getAccelerometerZ());*/
     	
     
     }
@@ -192,8 +141,8 @@ public class GameScreen implements Screen{
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        //instance.transform.translate(0.06f,0,0);
-       // instance.transform.rotate(1, 0, 0, 1);
+
+
         modelBatch.begin(cam);
         
         modelBatch.render(player.model,environment);
@@ -205,10 +154,65 @@ public class GameScreen implements Screen{
         modelBatch.end();
     }
 
+    private void handleInput(float delta) {
+        float roll = 0;
+
+        if (Gdx.input.isKeyPressed(Keys.D) || (Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
+
+            for (ModelPack model : models) {
+                model.location.x -= 0.7f * delta * 100;
+                model.updateTransform();
+            }
+            roll = 45;
+            space.transform.rotate(Vector3.Y, 1);
+        }
+        if (Gdx.input.isKeyPressed(Keys.A) || (Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
+
+            for (ModelPack model : models) {
+                model.location.x += 0.7f * delta * 100;
+                model.updateTransform();
+            }
+            roll = -45;
+            space.transform.rotate(Vector3.Y, -1);
+        }
+
+        player.rotation.setEulerAngles(180, 0, roll);
+        space.transform.rotate(Vector3.X, -0.05f);
+
+
+        if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
+            player.location.y += 0.7 * delta * 100;
+
+            player.rotation.setEulerAngles(180, -90, roll);
+            if (player.location.y >= 10) top = true;
+        } else if (player.location.y > 0) {
+            player.location.y -= 0.35 * delta * 100;
+
+
+        } else if (player.location.y <= 0) {
+            top = false;
+        }
+        cam.position.x = player.location.x;
+        cam.update();
+        if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
+            if (Gdx.app.getType().equals(Application.ApplicationType.Android))
+                Enfinity.androidAPI.makeToast("Restarting...");
+
+
+            dispose();
+            create();
+
+        }
+        player.rotation.setEulerAngles(180, 0, Gdx.input.getAccelerometerY() * 9f);
+    }
+
     @Override
     public void dispose() {
         modelBatch.dispose();
         model.dispose();
+        tex.dispose();
+//        assets.dispose();
+
     }
 
     @Override
