@@ -22,7 +22,6 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,8 +171,12 @@ public class GameScreen implements Screen{
     	cam.position.x=player.location.x;
     	cam.update();
 		if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
-			if (Gdx.app.getType().equals(Application.ApplicationType.Android))
-				Enfinity.androidAPI.makeToast("Restarting...");
+            if (Gdx.app.getType().equals(Application.ApplicationType.Android)) {
+                Enfinity.androidAPI.makeToast("Restarting...");
+                Gdx.app.log("Android", "sent toast test");
+            }
+
+
 
 			dispose();
     		create();

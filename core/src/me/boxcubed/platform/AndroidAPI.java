@@ -6,4 +6,5 @@ package me.boxcubed.platform;
 
 public interface AndroidAPI {
     void makeToast(String string);
+
 }
