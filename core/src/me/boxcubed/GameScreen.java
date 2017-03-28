@@ -2,6 +2,7 @@ package me.boxcubed;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -156,16 +157,17 @@ public class GameScreen implements Screen{
 
     private void handleInput(float delta) {
         float roll = 0;
+        if (!Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)) {
+            if (Gdx.input.isKeyPressed(Keys.D) || (Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
 
-        if (Gdx.input.isKeyPressed(Keys.D) || (Gdx.input.isTouched() && Gdx.input.getX() > Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
-
-            for (ModelPack model : models) {
-                model.location.x -= 0.7f * delta * 100;
-                model.updateTransform();
+                for (ModelPack model : models) {
+                    model.location.x -= 0.7f * delta * 100;
+                    model.updateTransform();
+                }
+                roll = 45;
+                space.transform.rotate(Vector3.Y, 1);
             }
-            roll = 45;
-            space.transform.rotate(Vector3.Y, 1);
-        }
+
         if (Gdx.input.isKeyPressed(Keys.A) || (Gdx.input.isTouched() && Gdx.input.getX() < Gdx.graphics.getWidth() / 2 && !Gdx.input.isTouched(1))) {
 
             for (ModelPack model : models) {
@@ -174,13 +176,25 @@ public class GameScreen implements Screen{
             }
             roll = -45;
             space.transform.rotate(Vector3.Y, -1);
+
+        }
+            player.rotation.setEulerAngles(180, 0, roll);
+        } else {//Code for usage of Accelerometer
+            player.rotation.setEulerAngles(180, 0, Gdx.input.getAccelerometerY() * 9f);
+            for (ModelPack model : models) {
+                model.location.x += -Gdx.input.getAccelerometerY() / 10 * delta * 100;
+                model.updateTransform();
+            }
+            space.transform.rotate(Vector3.Y, Gdx.input.getAccelerometerY() / 10 * delta * 100);
         }
 
-        player.rotation.setEulerAngles(180, 0, roll);
+
         space.transform.rotate(Vector3.X, -0.05f);
 
-
-        if ((Gdx.input.isKeyPressed(Keys.SPACE) || Gdx.input.isTouched(1)) && player.location.y < 10 && !top) {
+        //Code for Jump
+        if ((Gdx.input.isKeyPressed(Keys.SPACE) || (Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer) && Gdx.input.isTouched(0))
+                || Gdx.input.isTouched()
+        ) && player.location.y < 10 && !top) {
             player.location.y += 0.7 * delta * 100;
 
             player.rotation.setEulerAngles(180, -90, roll);
@@ -192,7 +206,8 @@ public class GameScreen implements Screen{
         } else if (player.location.y <= 0) {
             top = false;
         }
-        cam.position.x = player.location.x;
+        //cam.position.x = player.location.x;
+        player.updateTransform();
         cam.update();
         if (Gdx.input.isKeyJustPressed(Keys.R) || Gdx.input.isTouched(2)) {
             if (Gdx.app.getType().equals(Application.ApplicationType.Android))
@@ -203,7 +218,7 @@ public class GameScreen implements Screen{
             create();
 
         }
-        player.rotation.setEulerAngles(180, 0, Gdx.input.getAccelerometerY() * 9f);
+
     }
 
     @Override
