@@ -195,7 +195,7 @@ public class GameScreen implements Screen{
         modelBatch.end();
         collisionDrawer.begin(cam);
         models.forEach(model->{
-        	if(model.collisionObject!=null&&isVisible(model))
+        	if(model.collisionObject!=null&&isVisible(model)&&model.location.z>-120)
         	collisionWorld.debugDrawObject(model.collisionObject.getWorldTransform(), model.collisionShape, new Vector3(Color.CYAN.r, Color.CYAN.g, Color.CYAN.b));
         });
         collisionWorld.debugDrawObject(player.collisionObject.getWorldTransform(), player.collisionShape, new Vector3(Color.ORANGE.r, Color.ORANGE.g, Color.ORANGE.b));
